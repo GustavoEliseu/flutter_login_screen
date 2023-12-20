@@ -226,7 +226,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       });
                     }),
                 onChanged: (text) {
-                  _user = text;
+                  _password = text;
                 },
               ),
 

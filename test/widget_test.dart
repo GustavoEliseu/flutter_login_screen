@@ -7,8 +7,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login_screen/views/custom_widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:flutter_login_screen/utils/string_extension.dart';
 import 'package:flutter_login_screen/main.dart';
 
 //TODO - implement privacy click mocked test and layout tests.
@@ -29,10 +27,7 @@ void main() {
 
     expect(find.text('Login'), findsOneWidget);
     expect(find.text('Password'), findsOneWidget);
-
     expect(find.byType(TextFormField), findsExactly(2));
-
-    const String emptyError = "Password field is needed!";
 
     await tester.enterText(find.byType(TextFormField).first, "hi");
     await tester.enterText(find.byType(TextFormField).last, " ");
@@ -40,7 +35,6 @@ void main() {
     await tester.pump(const Duration(microseconds: 100));
 
     expect(find.text("hi"), findsOne);
-
     expect(find.byType(MyTextError), findsAny);
     expect(find.text(passwordShort), findsAny);
 
