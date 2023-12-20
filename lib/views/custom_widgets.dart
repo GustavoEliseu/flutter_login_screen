@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_login_screen/utils/string_extension.dart';
 import 'dart:ui' as ui show TextHeightBehavior;
 
 class MyTextError extends StatelessWidget {
@@ -99,7 +98,7 @@ class MyFormData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
+      width: MediaQuery.of(context).size.width,
       height: 124,
       child: Column(children: [
         Align(

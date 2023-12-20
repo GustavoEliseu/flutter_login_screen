@@ -35,6 +35,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String _password = "";
   String _user = "";
+  bool disposed = false;
 
   bool _passwordObscured = true;
   bool _doneButtonDisabled = false;
@@ -53,37 +54,47 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _updateUserErrorMessage(String? value) {
     userHasError = value != null;
-    Future.delayed(Duration.zero, () async {
-      setState(() {
-        _userErrorMessage = value;
-      });
+    Future.microtask(() async {
+      if (!disposed) {
+        setState(() {
+          _userErrorMessage = value;
+        });
+      }
     });
   }
 
   void _updatePasswordErrorMessage(String? value) {
     passwordHasError = value != null;
-    Future.delayed(Duration.zero, () async {
-      setState(() {
-        _passwordErrorMessage = value;
-      });
+    Future.microtask(() async {
+      if (!disposed) {
+        setState(() {
+          _passwordErrorMessage = value;
+        });
+      }
     });
   }
 
-  void _updatePasswordValidator() {
-    Future.delayed(Duration.zero, () async {
+  void _updatePasswordValidator(bool shouldValidate) {
+    Future.microtask(() async {
       setState(() {
-        _autoValidatePassword = AutovalidateMode.always;
+        _autoValidatePassword = shouldValidate
+            ? AutovalidateMode.always
+            : AutovalidateMode.disabled;
         setState(() {});
       });
     });
   }
 
-  void _updateUserValidator() {
-    Future.delayed(Duration.zero, () async {
-      setState(() {
-        _autoValidateUser = AutovalidateMode.always;
-        setState(() {});
-      });
+  void _updateUserValidator(bool shouldValidate) {
+    Future.microtask(() async {
+      if (!disposed) {
+        setState(() {
+          _autoValidateUser = shouldValidate
+              ? AutovalidateMode.always
+              : AutovalidateMode.disabled;
+          setState(() {});
+        });
+      }
     });
   }
 
@@ -101,14 +112,18 @@ class _MyHomePageState extends State<MyHomePage> {
       _passwordKey.currentState?.validate();
 
       if (passwordHasError) {
-        _updatePasswordValidator();
+        if (_autoValidatePassword != AutovalidateMode.always) {
+          _updatePasswordValidator(true);
+        }
         isValidData = false;
       }
 
       _userKey.currentState?.validate();
 
       if (userHasError) {
-        _updateUserValidator();
+        if (_autoValidateUser != AutovalidateMode.always) {
+          _updateUserValidator(true);
+        }
         isValidData = false;
       }
 
