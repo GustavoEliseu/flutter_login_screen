@@ -5,9 +5,9 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 import 'package:flutter/material.dart';
-import 'package:flutter_login_screen/views/custom_widgets.dart';
+import 'package:flutter_login_screen/custom_views/custom_widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_login_screen/views/login_page.dart';
+import 'package:flutter_login_screen/pages/login_page.dart';
 
 //TODO - implement privacy click mocked test and layout tests.
 void main() {
@@ -22,8 +22,9 @@ void main() {
 
   testWidgets('correct Login test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MaterialApp(
-        home: Scaffold(body: MyLoginScreen(title: 'Flutter Demo Home Page'))));
+    await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+            body: MyLoginScreen((user) {}, title: 'Flutter Demo Home Page'))));
 
     expect(find.text('Login'), findsOneWidget);
     expect(find.text('Password'), findsOneWidget);

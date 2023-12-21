@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login_screen/utils/scaffold_messanger_state_extension.dart';
 import 'package:flutter_login_screen/utils/string_extension.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_login_screen/views/custom_widgets.dart';
+import 'package:flutter_login_screen/custom_views/custom_widgets.dart';
+import 'package:flutter_login_screen/models/user_data.dart';
 
 class MyLoginScreen extends StatefulWidget {
-  const MyLoginScreen({super.key, required this.title});
+  const MyLoginScreen(this.loginFun, {super.key, required this.title});
   final String title;
+  final Function(User) loginFun;
 
   @override
   State<MyLoginScreen> createState() => _MyLoginScreenState();
@@ -108,8 +110,10 @@ class _MyLoginScreenState extends State<MyLoginScreen> {
       }
 
       if (isValidData) {
-        WidgetsBinding.instance.addPostFrameCallback((_) =>
-            ScaffoldMessenger.of(context).snackBar("Loading next page", null));
+        WidgetsBinding.instance.addPostFrameCallback((_) => {
+              ScaffoldMessenger.of(context).snackBar("Loading next page", null),
+              widget.loginFun(User(_user, _password))
+            });
       }
       _doneButtonDisabled = false;
     }
