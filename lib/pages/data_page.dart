@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login_screen/models/typed_text.dart';
 import 'package:flutter_login_screen/store/user.dart';
+import 'package:flutter_login_screen/custom_views/custom_dialog.dart';
 import 'package:uuid/uuid.dart';
 import 'package:provider/provider.dart';
 
@@ -31,10 +32,60 @@ class _MyDataScreenState extends State<MyDataScreen> {
   Future<void> _addValueToList(String textToAdd, UserStore userStore) async {
     var uuid = const Uuid();
     setState(() {
-      _dataTyped.add(TypedText(textToAdd,
-          uuid.v5(Uuid.NAMESPACE_URL, userStore.userTypedTextList!.userName)));
+      _dataTyped.add(TypedText(textToAdd, uuid.v4()));
       _saveList(userStore);
     });
+  }
+
+  Future<void> _deleteValueFromList(UserStore userStore, int index) async {
+    setState(() {
+      _dataTyped.removeAt(index);
+      _saveList(userStore);
+    });
+  }
+
+  Future<void> _editValueFromList(
+      UserStore userStore, int index, String editedText) async {
+    setState(() {
+      _dataTyped[index].text = editedText;
+      _saveList(userStore);
+    });
+  }
+
+  _editValue(String id) {
+    int index = _dataTyped.indexWhere((element) => element.id == id);
+    if (index >= 0) {
+      showDialog(
+          context: context,
+          builder: (context) => CustomDialog(
+                "edit",
+                _dataTyped[index].text,
+                true,
+                finishEdt: (text) {
+                  if (text.isNotEmpty) {
+                    _editValueFromList(userStore, index, text);
+                  } else {}
+                },
+              ));
+    } else {}
+  }
+
+  _deleteValue(String id, BuildContext context) {
+    int index = _dataTyped.indexWhere((element) => element.id == id);
+    if (index >= 0) {
+      showDialog(
+          context: context,
+          builder: (context) => CustomDialog(
+                "delete",
+                _dataTyped[index].text,
+                false,
+                finish: (delete) {
+                  if (delete) {
+                    _deleteValueFromList(userStore, index);
+                  }
+                },
+              ));
+    } else {}
   }
 
   @override
@@ -93,12 +144,34 @@ class _MyDataScreenState extends State<MyDataScreen> {
                                       .map<Widget>((v) => Column(children: [
                                             Container(
                                                 width: 300,
-                                                decoration: const BoxDecoration(
-                                                  color: Colors.grey,
-                                                ),
                                                 alignment: Alignment.center,
-                                                height: 50,
-                                                child: Text(v.text)),
+                                                height: 70,
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Expanded(
+                                                            child:
+                                                                Text(v.text)),
+                                                        IconButton(
+                                                            onPressed: () {
+                                                              _editValue(v.id);
+                                                            },
+                                                            icon: const Icon(
+                                                                Icons.edit)),
+                                                        IconButton(
+                                                            onPressed: () {
+                                                              _deleteValue(v.id,
+                                                                  context);
+                                                            },
+                                                            icon: const Icon(
+                                                                Icons.close))
+                                                      ],
+                                                    ),
+                                                    const Divider(
+                                                        color: Colors.black)
+                                                  ],
+                                                )),
                                             const SizedBox(height: 10),
                                           ]))
                                       .toList()
@@ -111,6 +184,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
                       height: 84,
                       width: 300,
                       child: TextFormField(
+                        autofocus: true,
                         key: _dataTextFormKey,
                         controller: textEditController,
                         decoration: InputDecoration(
