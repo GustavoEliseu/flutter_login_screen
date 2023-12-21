@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login_screen/models/typed_text.dart';
 import 'package:flutter_login_screen/store/user.dart';
 import 'package:flutter_login_screen/custom_views/custom_dialog.dart';
+import 'package:flutter_login_screen/utils/scaffold_messanger_state_extension.dart';
 import 'package:uuid/uuid.dart';
 import 'package:provider/provider.dart';
 
@@ -18,6 +19,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
   late UserStore userStore;
   bool wasListInitialized = false;
   List<TypedText> _dataTyped = [];
+  late FocusNode myFocusNode;
 
   final _dataTextFormKey = GlobalKey<FormFieldState>();
   TextEditingController textEditController = TextEditingController();
@@ -26,7 +28,13 @@ class _MyDataScreenState extends State<MyDataScreen> {
     if (userStore.userTypedTextList != null) {
       userStore.userTypedTextList?.typedTexts = _dataTyped;
       userStore.saveCurrentList();
-    } //TODO - add warning and create userTypedTextList if it's null for some reason
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) =>
+          ScaffoldMessenger.of(context).snackBar(
+              "Falha ao salvar list, logue novamente",
+              addClose: true));
+      widget.logoffFun();
+    }
   }
 
   Future<void> _addValueToList(String textToAdd, UserStore userStore) async {
@@ -64,10 +72,16 @@ class _MyDataScreenState extends State<MyDataScreen> {
                 finishEdt: (text) {
                   if (text.isNotEmpty) {
                     _editValueFromList(userStore, index, text);
-                  } else {}
+                  }
+                  myFocusNode.requestFocus();
                 },
               ));
-    } else {}
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) =>
+          ScaffoldMessenger.of(context)
+              .snackBar("Falha ao editar o valor", addClose: true));
+      myFocusNode.requestFocus();
+    }
   }
 
   _deleteValue(String id, BuildContext context) {
@@ -82,10 +96,16 @@ class _MyDataScreenState extends State<MyDataScreen> {
                 finish: (delete) {
                   if (delete) {
                     _deleteValueFromList(userStore, index);
+                    myFocusNode.requestFocus();
                   }
                 },
               ));
-    } else {}
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) =>
+          ScaffoldMessenger.of(context)
+              .snackBar("Falha ao deletar o valor", addClose: true));
+      myFocusNode.requestFocus();
+    }
   }
 
   @override
@@ -124,14 +144,15 @@ class _MyDataScreenState extends State<MyDataScreen> {
               return Column(
                 children: <Widget>[
                   const Spacer(),
-                  SingleChildScrollView(
-                      child: Container(
-                          height: 400,
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.only(top: 10),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                          ),
+                  Container(
+                      height: 400,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.only(top: 10),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                      ),
+                      child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
                           child: Column(
                               mainAxisAlignment: _dataTyped.isNotEmpty
                                   ? MainAxisAlignment.start
@@ -143,8 +164,9 @@ class _MyDataScreenState extends State<MyDataScreen> {
                                   ? _dataTyped
                                       .map<Widget>((v) => Column(children: [
                                             Container(
-                                                width: 300,
                                                 alignment: Alignment.center,
+                                                padding: const EdgeInsets.only(
+                                                    left: 16, right: 16),
                                                 height: 70,
                                                 child: Column(
                                                   children: [
@@ -186,6 +208,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
                       child: TextFormField(
                         autofocus: true,
                         key: _dataTextFormKey,
+                        focusNode: myFocusNode,
                         controller: textEditController,
                         decoration: InputDecoration(
                           error: null,
@@ -197,6 +220,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
                                   _addValueToList(
                                       textEditController.text, userStore);
                                   textEditController.clear();
+                                  myFocusNode.requestFocus();
                                 }
                               },
                               icon: const Icon(Icons.send)),
@@ -207,6 +231,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
                           if (text.isNotEmpty) {
                             _addValueToList(text, userStore);
                             textEditController.clear();
+                            myFocusNode.requestFocus();
                           }
                         },
                       )),
@@ -219,10 +244,12 @@ class _MyDataScreenState extends State<MyDataScreen> {
   @override
   void initState() {
     super.initState();
+    myFocusNode = FocusNode();
   }
 
   @override
   void dispose() {
+    myFocusNode.dispose();
     userStore
         .logout(); //TODO = Check if logout is being called when going back to login Screen
     super.dispose();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_login_screen/mock_repository/mock_login_repository.dart';
 import 'package:flutter_login_screen/utils/scaffold_messanger_state_extension.dart';
 import 'package:flutter_login_screen/utils/string_extension.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -21,6 +22,7 @@ class _MyLoginScreenState extends State<MyLoginScreen> {
 
   bool _passwordObscured = true;
   bool _doneButtonDisabled = false;
+  bool _loadingButton = false;
 
   bool userHasError = false;
   bool passwordHasError = false;
@@ -42,6 +44,12 @@ class _MyLoginScreenState extends State<MyLoginScreen> {
           _userErrorMessage = value;
         });
       }
+    });
+  }
+
+  void _updateLoadingButton(bool isLoading) {
+    Future.microtask(() async {
+      _loadingButton = isLoading;
     });
   }
 
@@ -87,7 +95,30 @@ class _MyLoginScreenState extends State<MyLoginScreen> {
     }
   }
 
+  void _checkLoginFromApi(User loginUser) async {
+    (String message, int statusCode) response =
+        await LoginRepository().login(loginUser);
+    switch (response.$2) {
+      case 200:
+        WidgetsBinding.instance.addPostFrameCallback((_) => {
+              ScaffoldMessenger.of(context).snackBar(response.$1,
+                  addClose: true, duration: const Duration(milliseconds: 2000)),
+              widget.loginFun(loginUser)
+            });
+        _doneButtonDisabled = false;
+      default:
+        WidgetsBinding.instance.addPostFrameCallback((_) =>
+            ScaffoldMessenger.of(context)
+                .snackBar(response.$1, addClose: true));
+        setState(() {
+          _doneButtonDisabled = false;
+        });
+    }
+    _updateLoadingButton(false);
+  }
+
   void doneButtonClick() {
+    _updateLoadingButton(true);
     if (!_doneButtonDisabled) {
       bool isValidData = true;
       _doneButtonDisabled = true;
@@ -110,13 +141,11 @@ class _MyLoginScreenState extends State<MyLoginScreen> {
       }
 
       if (isValidData) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => {
-              ScaffoldMessenger.of(context)
-                  .snackBar("Logging in", addClose: true),
-              widget.loginFun(User(_user, _password))
-            });
+        User loginUser = User(_user, _password);
+        _checkLoginFromApi(loginUser);
+      } else {
+        _doneButtonDisabled = false;
       }
-      _doneButtonDisabled = false;
     }
   }
 
@@ -218,18 +247,20 @@ class _MyLoginScreenState extends State<MyLoginScreen> {
               const SizedBox(height: 16),
 
               //Login Button
-              ElevatedButton(
-                  key: _doneButtonKey,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 69, 189, 111),
-                  ),
-                  onPressed: () {
-                    doneButtonClick();
-                  },
-                  child: const Text(
-                    "Logar",
-                    style: TextStyle(color: Colors.white),
-                  )),
+              if (!_loadingButton)
+                ElevatedButton(
+                    key: _doneButtonKey,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 69, 189, 111),
+                    ),
+                    onPressed: () {
+                      doneButtonClick();
+                    },
+                    child: const Text(
+                      "Logar",
+                      style: TextStyle(color: Colors.white),
+                    )),
+              if (_loadingButton) const CircularProgressIndicator(),
 
               const Spacer(),
 
