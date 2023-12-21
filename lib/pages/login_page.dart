@@ -111,7 +111,8 @@ class _MyLoginScreenState extends State<MyLoginScreen> {
 
       if (isValidData) {
         WidgetsBinding.instance.addPostFrameCallback((_) => {
-              ScaffoldMessenger.of(context).snackBar("Loading next page", null),
+              ScaffoldMessenger.of(context)
+                  .snackBar("Logging in", addClose: true),
               widget.loginFun(User(_user, _password))
             });
       }

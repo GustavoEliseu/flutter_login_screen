@@ -1,13 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_login_screen/models/typed_text.dart';
 import 'package:flutter_login_screen/store/user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import 'package:uuid/uuid.dart';
 import 'package:provider/provider.dart';
-import 'package:mobx/mobx.dart';
 
 class MyDataScreen extends StatefulWidget {
   const MyDataScreen(this.logoffFun, {super.key, required this.title});
@@ -19,26 +14,18 @@ class MyDataScreen extends StatefulWidget {
 }
 
 class _MyDataScreenState extends State<MyDataScreen> {
-  final _dataTextFormKey = GlobalKey<FormFieldState>();
   late UserStore userStore;
   bool wasListInitialized = false;
-
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-
-  TextEditingController textEditController = TextEditingController();
-
   List<TypedText> _dataTyped = [];
 
-  Future<void> _saveList(UserStore userStore) async {
-    final SharedPreferences prefs = await _prefs;
+  final _dataTextFormKey = GlobalKey<FormFieldState>();
+  TextEditingController textEditController = TextEditingController();
 
+  Future<void> _saveList(UserStore userStore) async {
     if (userStore.userTypedTextList != null) {
       userStore.userTypedTextList?.typedTexts = _dataTyped;
       userStore.saveCurrentList();
-      //final String encodedList = json.encode(userStore.userTypedTextList);
-
-      //prefs.setString(userStore.userTypedTextList!.userName, encodedList);
-    } else {}
+    } //TODO - add warning and create userTypedTextList if it's null for some reason
   }
 
   Future<void> _addValueToList(String textToAdd, UserStore userStore) async {
@@ -90,7 +77,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
                       child: Container(
                           height: 400,
                           alignment: Alignment.center,
-                          padding: EdgeInsets.only(top: 10),
+                          padding: const EdgeInsets.only(top: 10),
                           decoration: const BoxDecoration(
                             color: Colors.white,
                           ),
@@ -162,7 +149,8 @@ class _MyDataScreenState extends State<MyDataScreen> {
 
   @override
   void dispose() {
-    userStore.logout();
+    userStore
+        .logout(); //TODO = Check if logout is being called when going back to login Screen
     super.dispose();
   }
 }

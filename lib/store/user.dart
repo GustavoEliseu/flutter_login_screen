@@ -68,7 +68,6 @@ abstract class UserStoreBase with Store {
         : '';
 
     if (userList.isNotEmpty) {
-      print(userList);
       userTypedTextList = UserTypedTextList.fromJson(jsonDecode(userList));
     }
   }

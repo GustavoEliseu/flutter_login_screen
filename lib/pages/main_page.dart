@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_login_screen/models/user_data.dart';
-import 'package:flutter_login_screen/models/typed_text.dart';
-import 'package:flutter_login_screen/store/user.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_login_screen/pages/data_page.dart';
+import 'package:flutter_login_screen/pages/login_page.dart';
+import 'package:flutter_login_screen/utils/scaffold_messanger_state_extension.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_login_screen/store/user.dart';
 
 class MyMainScreen extends StatefulWidget {
   const MyMainScreen({super.key});
@@ -15,14 +16,14 @@ class MyMainScreen extends StatefulWidget {
 class _MyMainScreenState extends State<MyMainScreen> {
   User? _user;
 
-  void _updateUser(User? value) {
+  void _updateUser(User? value, BuildContext context) {
     Future.microtask(() async {
       setState(() {
         _user = value;
         if (_user == null) {
           Navigator.pop(context);
         } else {
-          navigateToScreen2();
+          navigateToScreen2(context);
         }
       });
     });
@@ -36,23 +37,25 @@ class _MyMainScreenState extends State<MyMainScreen> {
     });
   }
 
-  void navigateToScreen2() {
+  void navigateToScreen2(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => MyDataScreen(() {
-                _updateUser(null);
+                ScaffoldMessenger.of(context)
+                    .snackBar("Logging out", addClose: true);
+                _clearUser(true);
+                _updateUser(null, context);
               }, title: 'Data Screen')),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final userStore = Provider.of<UserStore>(context);
-    userStore.loginNewUser(User("bbb", "aaa"));
-    return MyDataScreen(() {}, title: 'Data Screen');
-    /*return MyLoginScreen((newUser) {
-      _updateUser(newUser);
-    }, title: 'Login Screen');*/
+    UserStore userStore = Provider.of<UserStore>(context);
+    return MyLoginScreen((newUser) {
+      userStore.loginNewUser(newUser);
+      _updateUser(newUser, context);
+    }, title: 'Login Screen');
   }
 }
