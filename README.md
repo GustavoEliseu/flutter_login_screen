@@ -1,5 +1,7 @@
 # Português- flutter_login_screen <br>
 
+Para testar, acessar ou acessar a página "releases" à direita no github, ou clonar o projeto e compilar. 
+Para Iphones e MacOS será necessário compilar o projeto.
   
 Um simples aplicativo em flutter desenvolvido para um desafio.
 
