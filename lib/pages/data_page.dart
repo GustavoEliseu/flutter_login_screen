@@ -209,6 +209,9 @@ class _MyDataScreenState extends State<MyDataScreen> {
                         autofocus: true,
                         key: _dataTextFormKey,
                         focusNode: myFocusNode,
+                        onTapOutside: (event) {
+                          myFocusNode.requestFocus();
+                        },
                         controller: textEditController,
                         decoration: InputDecoration(
                           error: null,
