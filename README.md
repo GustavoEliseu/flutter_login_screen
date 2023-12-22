@@ -1,16 +1,45 @@
-# flutter_login_screen
+# Português- flutter_login_screen <br>
 
-A new Flutter project.
+  
+Um simples aplicativo em flutter desenvolvido para um desafio.
 
-## Getting Started
+O aplicativo tem 2 telas, sendo uma de login utilizando uma api mockada usando mockito, e uma tela de dados onde o usuário pode digitar e salvar textos que são vinculados ao usuário utilizado ao logar.
 
-This project is a starting point for a Flutter application.
+## Mudanças não solicitadas no desafio:<br>
 
-A few resources to get you started if this is your first Flutter project:
+  -Foi utilizado mockito com DIO, com o objetivo de uma liberade maior para lidar com erros de requisição e respostas únicas sem depender de plataformas pagas/limitadas.<br>
+  
+  -As senhas estão sendo transformadas em uma string de binários que logo em seguida são reordenados com um algoritmo de encriptação. Esta parte poderia ser modificada para uma encriptação MD5, mas não é uma prioridade para este projeto.<br>
+  
+  -O aplicativo foi testado em Android, Ios, Browser(Chrome,Brave) nos sistemas operacionais Windows e MacOS. Também foi testado no android nativo do Windows 11.<br>
+  
+  -Pequenos exemplos de testes unitários e automatizados foram implementados.<br>
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Verificação de senha em tempo real, e video completo do aplicativo
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+<p align="center">
+<img src="https://github.com/GustavoEliseu/flutter_login_screen/blob/main/Releases/flutter_login_gustavo_video.gif" width="240" height="500"/>
+</p>
+Url to the video: https://github.com/GustavoEliseu/flutter_login_screen/blob/main/Releases/flutter_login_gustavo_video.webm
+
+# English- flutter_login_screen
+
+A small flutter app developed as a challenge.
+
+Has two screens, being a login one with a mocked api using mockito and a data screen, where a user can type texts that will be saved with sharedpreferences.
+
+## Changes not requested in the challenge:<br>
+
+  -Used mockito and DIO instead of mockApi, due to it providing a better capacity to deal with http erros and unique responses without any paid service.<br>
+
+  -Password is being encrypted to binary then every char of the binary string is being reordered again. This should be changed to an MD5 encryption later, but not a priority for this project.<br>
+
+  -The app was tested on android, ios, web and Windows11/Android.<br>
+
+  -Small sample of unit and automated tests were implemented.<br>
+
+<br>
+Improvements needed: 
+-Small changes are needed to guarantee that there are no memory leaks on the app. <br>
+-A change on the sharedPreferences to save only when the screen is being closed is needed to improve battery usage.<br>
