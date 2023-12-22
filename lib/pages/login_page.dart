@@ -70,7 +70,6 @@ class _MyLoginScreenState extends State<MyLoginScreen> {
         _autoValidatePassword = shouldValidate
             ? AutovalidateMode.always
             : AutovalidateMode.disabled;
-        setState(() {});
       });
     });
   }
@@ -82,7 +81,6 @@ class _MyLoginScreenState extends State<MyLoginScreen> {
           _autoValidateUser = shouldValidate
               ? AutovalidateMode.always
               : AutovalidateMode.disabled;
-          setState(() {});
         });
       }
     });
@@ -144,6 +142,7 @@ class _MyLoginScreenState extends State<MyLoginScreen> {
         User loginUser = User(_user, _password);
         _checkLoginFromApi(loginUser);
       } else {
+        _updateLoadingButton(false);
         _doneButtonDisabled = false;
       }
     }
